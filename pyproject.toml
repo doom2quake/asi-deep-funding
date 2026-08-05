@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ledgerkeep"
+version = "0.1.0"
+description = "A guardrailed autonomous operations agent, published as a decentralized AI service on the ASI / Fetch.ai stack."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Dipankar Sarkar" }]
+keywords = ["autonomous-agents", "asi", "fetch.ai", "uagents", "agent-safety", "guardrails"]
+
+# The offline loop, the service contract, and the whole test suite run with only
+# the standard library plus python-dotenv. The ASI/Fetch.ai and MCP paths are
+# optional extras, loaded behind an adapter seam only when configured.
+dependencies = [
+  "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+asi = ["uagents>=0.11"]
+mcp = ["mcp>=1.0"]
+
+[project.scripts]
+ledgerkeep = "ledgerkeep.demo:main"
+
+[tool.setuptools]
+packages = ["ledgerkeep", "ledgerkeep.agent_core"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
