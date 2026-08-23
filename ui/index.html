@@ -1,0 +1,381 @@
+<title>Ledgerkeep — Incident Console</title>
+<style>
+  :root {
+    --ink: #0d1117;
+    --panel: #161b26;
+    --panel-2: #1b2130;
+    --line: #242c3a;
+    --line-soft: #1e2531;
+    --text: #c7d0dd;
+    --text-dim: #7f8b9e;
+    --text-faint: #56617a;
+    --amber: #f5a623;
+    --amber-soft: rgba(245, 166, 35, 0.12);
+    --critical: #ff5c6c;
+    --good: #3fb488;
+    --violet: #8a7cff;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 600px at 78% -8%, rgba(245, 166, 35, 0.06), transparent 60%),
+      var(--ink);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 34px 28px 60px; }
+
+  /* ---- masthead ---- */
+  .masthead {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap;
+    padding-bottom: 22px; border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; flex-direction: column; gap: 8px; }
+  .brand h1 {
+    margin: 0; font-size: 27px; font-weight: 650; letter-spacing: -0.02em;
+    color: #edf1f7; display: flex; align-items: center; gap: 12px;
+  }
+  .keymark {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: linear-gradient(150deg, var(--amber), #d6841a);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #1a1205; font-weight: 800; font-size: 15px; flex: none;
+    box-shadow: 0 2px 10px rgba(245, 166, 35, 0.3);
+  }
+  .brand .sub { color: var(--text-dim); font-size: 13.5px; max-width: 60ch; }
+  .brand .sub b { color: var(--text); font-weight: 600; }
+
+  .service-card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 16px; min-width: 260px;
+    display: flex; flex-direction: column; gap: 9px;
+  }
+  .service-card .row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  .service-card .k { color: var(--text-faint); font-size: 11px; text-transform: uppercase; letter-spacing: 0.09em; }
+  .service-card .v { font-family: var(--mono); font-size: 12.5px; color: var(--text); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 7px; }
+  .dot.live { background: var(--good); box-shadow: 0 0 0 3px rgba(63, 180, 136, 0.16); }
+  .dot.offline { background: var(--amber); box-shadow: 0 0 0 3px var(--amber-soft); }
+
+  /* ---- hero band ---- */
+  .hero {
+    margin-top: 26px;
+    display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px;
+  }
+  .hero-figure {
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 4px; position: relative; overflow: hidden;
+  }
+  .hero-figure::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, transparent 60%, rgba(255, 92, 108, 0.05));
+  }
+  .eyebrow {
+    text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px;
+    color: var(--text-faint); font-weight: 600;
+  }
+  .bignum {
+    font-family: var(--mono); font-size: 46px; font-weight: 600; letter-spacing: -0.02em;
+    color: var(--critical); line-height: 1.05; font-variant-numeric: tabular-nums;
+    display: flex; align-items: baseline; gap: 12px; margin-top: 4px;
+  }
+  .bignum .delta { font-size: 20px; color: var(--critical); }
+  .hero-figure .caption { color: var(--text-dim); font-size: 13.5px; margin-top: 8px; max-width: 46ch; }
+  .hero-figure .caption b { color: var(--text); }
+
+  .fix-card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-left: 3px solid var(--amber); border-radius: 14px; padding: 20px 22px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .fix-card .fix-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .fix-card h3 { margin: 0; font-size: 16px; color: #edf1f7; font-weight: 620; letter-spacing: -0.01em; }
+  .badge-await {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--amber); background: var(--amber-soft); border: 1px solid rgba(245, 166, 35, 0.3);
+    padding: 4px 9px; border-radius: 999px; white-space: nowrap;
+  }
+  .diff {
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.6;
+    background: #0b0e15; border: 1px solid var(--line-soft); border-radius: 9px;
+    padding: 12px 14px; color: var(--text); overflow-x: auto; white-space: pre;
+  }
+  .diff .rm { color: var(--critical); }
+  .diff .add { color: var(--good); }
+  .diff .cm { color: var(--text-faint); }
+  .fix-card .why { color: var(--text-dim); font-size: 13px; }
+
+  /* ---- section layout ---- */
+  .cols { margin-top: 16px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; align-items: start; }
+  @media (max-width: 900px) {
+    .hero, .cols { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    padding: 18px 20px; margin-bottom: 16px;
+  }
+  .panel > h2 {
+    margin: 0 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-faint); font-weight: 700;
+  }
+  .panel > .hint { color: var(--text-faint); font-size: 12px; margin: 0 0 16px; }
+
+  /* ---- investigation chain (timeline) ---- */
+  .chain { display: flex; flex-direction: column; }
+  .step {
+    display: grid; grid-template-columns: 34px 1fr; gap: 14px; padding-bottom: 18px; position: relative;
+  }
+  .step:not(:last-child)::before {
+    content: ""; position: absolute; left: 16px; top: 30px; bottom: 0; width: 1px; background: var(--line);
+  }
+  .step .marker {
+    width: 32px; height: 32px; border-radius: 9px; flex: none;
+    background: var(--panel-2); border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 12px; color: var(--amber); font-weight: 600; z-index: 1;
+  }
+  .step.done .marker { color: var(--good); border-color: rgba(63, 180, 136, 0.35); }
+  .step .body { padding-top: 3px; }
+  .step .body .t {
+    font-size: 14px; color: #e8edf4; font-weight: 600; margin-bottom: 3px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .step .body .t .tag {
+    font-family: var(--mono); font-size: 10.5px; color: var(--text-faint);
+    text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;
+  }
+  .step .body .d { color: var(--text-dim); font-size: 13px; }
+  .step .body .d code {
+    font-family: var(--mono); font-size: 12px; color: var(--text);
+    background: var(--panel-2); padding: 1px 5px; border-radius: 4px;
+  }
+  .step .body .metric-line { font-family: var(--mono); font-size: 12.5px; color: var(--text); margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .neg { color: var(--critical); }
+  .pos { color: var(--good); }
+
+  /* ---- guardrail chips ---- */
+  .guardrails { display: flex; flex-direction: column; gap: 9px; }
+  .grail {
+    display: flex; align-items: center; gap: 11px;
+    background: var(--panel-2); border: 1px solid var(--line-soft); border-radius: 9px; padding: 10px 12px;
+  }
+  .grail .icon { width: 20px; height: 20px; flex: none; display: flex; align-items: center; justify-content: center; }
+  .grail .icon svg { width: 15px; height: 15px; }
+  .grail .name { font-family: var(--mono); font-size: 12px; color: #e8edf4; font-weight: 600; }
+  .grail .detail { color: var(--text-faint); font-size: 11.5px; margin-left: auto; text-align: right; }
+  .grail.clean .icon { color: var(--good); }
+  .grail.pass .icon { color: var(--good); }
+
+  /* ---- audit object ---- */
+  .audit-obj { display: flex; flex-direction: column; gap: 10px; }
+  .kv { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
+  .kv .k { color: var(--text-faint); font-size: 12px; }
+  .kv .v { font-family: var(--mono); font-size: 12px; color: var(--text); text-align: right; }
+  .hashbox {
+    margin-top: 4px; background: #0b0e15; border: 1px dashed rgba(245, 166, 35, 0.35);
+    border-radius: 9px; padding: 11px 13px;
+  }
+  .hashbox .lbl { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--amber); font-weight: 700; margin-bottom: 6px; }
+  .hashbox .hash { font-family: var(--mono); font-size: 11.5px; color: var(--text); word-break: break-all; line-height: 1.55; }
+  .hashbox .note { color: var(--text-faint); font-size: 11px; margin-top: 7px; }
+
+  /* ---- event history ---- */
+  .events { display: flex; flex-direction: column; }
+  .ev { display: grid; grid-template-columns: 62px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line-soft); }
+  .ev:last-child { border-bottom: none; }
+  .ev .ts { font-family: var(--mono); font-size: 11px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+  .ev .msg { font-size: 12.5px; color: var(--text-dim); }
+  .ev .msg b { color: var(--text); font-weight: 600; }
+  .ev .msg .chip {
+    font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 1px 6px; border-radius: 5px; margin-left: 6px; border: 1px solid var(--line);
+    color: var(--text-faint);
+  }
+  .ev .msg .chip.testnet { color: var(--violet); border-color: rgba(138, 124, 255, 0.35); }
+
+  footer {
+    margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    color: var(--text-faint); font-size: 12px;
+  }
+  footer .mono { font-family: var(--mono); }
+  footer b { color: var(--text-dim); font-weight: 600; }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="brand">
+      <h1><span class="keymark">L</span>Ledgerkeep</h1>
+      <div class="sub">
+        A guardrailed autonomous operations agent, published as a <b>decentralized AI service
+        on the ASI / Fetch.ai stack</b>. It investigates one moved number, attributes it,
+        quantifies the loss, and proposes the fix — and returns a verifiable audit object with every call.
+        It proposes; a human owns the merge.
+      </div>
+    </div>
+
+    <div class="service-card" aria-label="Marketplace service manifest">
+      <div class="row"><span class="k">service</span><span class="v">ledgerkeep</span></div>
+      <div class="row"><span class="k">contract</span><span class="v">InvestigationRequest → Response · v1.0</span></div>
+      <div class="row"><span class="k">network</span><span class="v"><span class="dot offline"></span>testnet</span></div>
+      <div class="row"><span class="k">transport</span><span class="v">offline · keyless</span></div>
+    </div>
+  </header>
+
+  <!-- HERO: the number that moved, and the fix it produced -->
+  <section class="hero">
+    <div class="hero-figure">
+      <div class="eyebrow">EMEA settled revenue · 2026-08-25</div>
+      <div class="bignum">$262,400 <span class="delta">▼ 35.8%</span></div>
+      <div class="caption">
+        Against a baseline of <b>$408,414</b> (z = <b>−3.81</b>). Order volume held flat;
+        settled revenue collapsed because EMEA authorisations are being declined at a gateway
+        a config push moved them to at 14:03.
+      </div>
+    </div>
+
+    <div class="fix-card">
+      <div class="fix-head">
+        <h3>Proposed fix</h3>
+        <span class="badge-await">Awaiting human approval</span>
+      </div>
+      <div class="diff"><span class="cm"># payments-router · revert migration step 2/3</span>
+route(region=EMEA) → <span class="rm">gw-adyen-v2</span>
+route(region=EMEA) → <span class="add">gw-stripe</span></div>
+      <div class="why">Reverting the attributed change settles the <b style="color:var(--text)">1,568</b>
+        declined EMEA authorisations. Recovers about <b style="color:var(--text)">$146,014</b>.</div>
+    </div>
+  </section>
+
+  <!-- CHAIN + RAIL -->
+  <div class="cols">
+
+    <!-- left: investigation chain -->
+    <div>
+      <div class="panel">
+        <h2>Investigation chain</h2>
+        <p class="hint">The audited path from a number moving to a proposed fix. Order carries meaning: each step feeds the next, and every decision is recorded.</p>
+        <div class="chain">
+
+          <div class="step done">
+            <div class="marker">01</div>
+            <div class="body">
+              <div class="t">Detect <span class="tag">trailing z-score</span></div>
+              <div class="d">Settled-revenue anomaly on the latest day.</div>
+              <div class="metric-line">value <b>$262,400</b> · baseline <b>$408,414</b> · z <span class="neg">−3.81</span></div>
+            </div>
+          </div>
+
+          <div class="step done">
+            <div class="marker">02</div>
+            <div class="body">
+              <div class="t">Attribute <span class="tag">rule over change log</span></div>
+              <div class="d">The <code>gw-adyen-v2</code> gateway is declining <b style="color:var(--text)">85%</b> of EMEA
+                authorisations. Attributed to the <code>14:03 config_push</code> by <code>deploy-bot</code>.</div>
+            </div>
+          </div>
+
+          <div class="step done">
+            <div class="marker">03</div>
+            <div class="body">
+              <div class="t">Quantify</div>
+              <div class="d">About <b style="color:var(--text)">$146,014</b> settled revenue unrealised on the day.</div>
+            </div>
+          </div>
+
+          <div class="step done">
+            <div class="marker">04</div>
+            <div class="body">
+              <div class="t">Propose <span class="tag">unapproved</span></div>
+              <div class="d">Fail EMEA card authorisations back to <code>gw-stripe</code>. Returned <b style="color:var(--text)">approved = false</b>.</div>
+            </div>
+          </div>
+
+          <div class="step done">
+            <div class="marker">05</div>
+            <div class="body">
+              <div class="t">Verify</div>
+              <div class="d">Re-read after the proposed failover: settled revenue is back within the normal band.
+                The incident would <span class="pos">clear</span>.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- right rail -->
+    <div>
+
+      <div class="panel">
+        <h2>Guardrails enforced</h2>
+        <p class="hint">Each recorded on the run by name — a count of what happened, not a claim.</p>
+        <div class="guardrails">
+          <div class="grail clean">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 4-3 6.5-7 9-4-2.5-7-5-7-9V7z"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <span class="name">CONTENT_SAFETY</span>
+            <span class="detail">attribution: clean</span>
+          </div>
+          <div class="grail pass">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h6"/></svg></span>
+            <span class="name">DOMAIN_ROUTER</span>
+            <span class="detail">domain: finance</span>
+          </div>
+          <div class="grail pass">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <span class="name">ACTION_LIMITER</span>
+            <span class="detail">propose: 1 / 4 this cycle</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Audit object</h2>
+        <p class="hint">Returned with every call. A caller recomputes the hash from the visible chain and confirms nothing was edited.</p>
+        <div class="audit-obj">
+          <div class="kv"><span class="k">run_id</span><span class="v">run-20260825T204713-a75959</span></div>
+          <div class="kv"><span class="k">status</span><span class="v">acted</span></div>
+          <div class="kv"><span class="k">domain</span><span class="v">finance</span></div>
+          <div class="kv"><span class="k">delivery_mode</span><span class="v">offline_fixture</span></div>
+          <div class="hashbox">
+            <div class="lbl">content_hash · sha256</div>
+            <div class="hash">7d735e4ee91547f25deb2bd262182fd85439c0a87ed79c0c250ca0560a55fd25</div>
+            <div class="note">Milestone 3 anchors this hash to a public testnet for after-the-fact tamper-evidence.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Service event history</h2>
+        <p class="hint">This invocation as marketplace events. Testnet only during the grant.</p>
+        <div class="events">
+          <div class="ev"><span class="ts">20:47:13</span><span class="msg"><b>Request received</b> · InvestigationRequest v1.0<span class="chip">contract</span></span></div>
+          <div class="ev"><span class="ts">20:47:13</span><span class="msg">Run opened <b>run-…a75959</b><span class="chip">state</span></span></div>
+          <div class="ev"><span class="ts">20:47:13</span><span class="msg">Guardrails cleared · 3 decisions recorded<span class="chip">audit</span></span></div>
+          <div class="ev"><span class="ts">20:47:13</span><span class="msg"><b>Response returned</b> · fix proposed, unapproved<span class="chip">contract</span></span></div>
+          <div class="ev"><span class="ts">—</span><span class="msg">Audit hash anchoring <b>(off)</b> · env-gated, testnet<span class="chip testnet">M3 · testnet</span></span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <span>Built on the vendored <b>agent_core</b> control plane — guardrails, domain router, durable run state, MCP bridge.</span>
+    <span class="mono">doom2quake / ledgerkeep · MIT · offline &amp; keyless</span>
+  </footer>
+
+</div>
