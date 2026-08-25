@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use Ledgerkeep in your work, please cite it as below."
+title: "Ledgerkeep: A Guardrailed Autonomous Operations Agent as a Decentralized AI Service"
+abstract: >-
+  Ledgerkeep is a guardrailed autonomous operations agent published as a
+  decentralized AI service on the ASI / Fetch.ai stack. Given a typed
+  marketplace request it detects a settled-revenue anomaly by trailing z-score,
+  attributes it to a specific configuration change, quantifies the loss in
+  currency, and proposes the one-line fix, returning an audit object with every
+  call so a caller can verify the chain from a number moved to a proposed fix.
+  The agent proposes but never executes: the merge stays with a human. Its
+  autonomy is bounded by named guardrails tested independently of any model,
+  and it runs its full loop offline against a fixture ledger with no network.
+type: software
+authors:
+  - family-names: Sarkar
+    given-names: Dipankar
+    alias: doom2quake
+repository-code: "https://github.com/doom2quake/ledgerkeep"
+version: 0.1.0
+date-released: "2026-08-25"
+license: MIT
+keywords:
+  - autonomous agents
+  - decentralized AI services
+  - ASI
+  - Fetch.ai
+  - uAgents
+  - agent safety
+  - guardrails
+  - operations
+  - anomaly attribution
+preferred-citation:
+  type: software
+  title: "Ledgerkeep: A Guardrailed Autonomous Operations Agent as a Decentralized AI Service"
+  authors:
+    - family-names: Sarkar
+      given-names: Dipankar
+  year: 2026
+  version: 0.1.0
+  url: "https://github.com/doom2quake/ledgerkeep"
