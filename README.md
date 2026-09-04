@@ -16,7 +16,7 @@ recorded by name on every run.
 documented contract, the audit object on every call, and the offline loop and
 guardrail suite running green. Testnet only, never mainnet.
 
-**[▶ Live demo](https://doom2quake.github.io/ledgerkeep/ui/)**  ·  **[Watch the walkthrough](https://youtu.be/LEDGERKEEP_VIDEO)**  ·  **[Paper (PDF)](paper/paper.pdf)**  ·  **[Deck (PDF)](deck/deck.pdf)**  ·  Built for the **[ASI Alliance](https://superintelligence.io/)**
+**[▶ Live demo](https://doom2quake.github.io/ledgerkeep/ui/)**  ·  **[Watch the walkthrough](https://youtu.be/3Lae0DWEe2w)**  ·  **[Paper (PDF)](paper/paper.pdf)**  ·  **[Deck (PDF)](deck/deck.pdf)**  ·  Built for the **[ASI Alliance](https://superintelligence.io/)**
 
 Read [docs/LIMITATIONS.md](docs/LIMITATIONS.md) first for the short version of what
 has run, what is simulated, and what is not built. Nothing on this page contradicts
@@ -191,7 +191,7 @@ The full milestone-mapped write-up is in [docs/PROPOSAL.md](docs/PROPOSAL.md).
   transaction hashes.
 - **Walkthrough video:** [`docs/ledgerkeep-demo.mp4`](docs/ledgerkeep-demo.mp4), a
   narrated tour of the 03:00 problem, the guardrails, the service contract, and the
-  grant roadmap (also on [YouTube](https://youtu.be/LEDGERKEEP_VIDEO)).
+  grant roadmap (also on [YouTube](https://youtu.be/3Lae0DWEe2w)).
 - **Demo script:** `DEMO.md`, the recording kit.
 
 [![Ledgerkeep incident console](docs/ui.png)](https://doom2quake.github.io/ledgerkeep/ui/)
