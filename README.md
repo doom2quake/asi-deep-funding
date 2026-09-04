@@ -204,7 +204,7 @@ The full milestone-mapped write-up is in [docs/PROPOSAL.md](docs/PROPOSAL.md).
   title   = {Ledgerkeep: A Guardrailed Autonomous Operations Agent as a Decentralized AI Service},
   year    = {2026},
   version = {0.1.0},
-  url     = {https://github.com/doom2quake/asi-deep-funding},
+  url     = {https://github.com/doom2quake/ledgerkeep},
   license = {MIT}
 }
 ```

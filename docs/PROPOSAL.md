@@ -4,7 +4,7 @@
 **Programme:** ASI Deep Funding (SingularityNET, Artificial Superintelligence Alliance)
 **Programme page:** https://deepfunding.ai/
 **Requested:** milestone-based grant, non-dilutive, IP retained by the team
-**Project repo:** `github.com/doom2quake/asi-deep-funding` (new repo, purpose-built for this entry)
+**Project repo:** `github.com/doom2quake/ledgerkeep` (new repo, purpose-built for this entry)
 **Status of this document:** draft grant proposal, testnet-only scope, no mainnet deployment
 
 ---
@@ -130,7 +130,7 @@ reviewer verifies it independently, and what it unlocks. All Web3 or on-chain
 interaction is **testnet only** for the duration of the grant.
 
 **Milestone 1: the re-themed service, its contract, and the audit object (weeks 0 to 4). BUILT.**
-Deliverable: the `doom2quake/asi-deep-funding` repository with a documented
+Deliverable: the `doom2quake/ledgerkeep` repository with a documented
 marketplace service contract (typed request and response) and the audit object
 returned on every call, with the offline loop and guardrail suite green.
 Verify: clone the repo, run the suite, confirm 82 tests pass offline with no
@@ -232,7 +232,7 @@ evaporating.
   author  = {Dipankar Sarkar},
   title   = {Ledgerkeep: A Guardrailed Autonomous Operations Agent as a Decentralized AI Service},
   year    = {2026},
-  url     = {https://github.com/doom2quake/asi-deep-funding},
+  url     = {https://github.com/doom2quake/ledgerkeep},
   license = {MIT}
 }
 ```
