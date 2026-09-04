@@ -1,16 +1,28 @@
 # Ledgerkeep
 
-**A guardrailed autonomous operations agent, published as a decentralized AI service on the ASI / Fetch.ai stack.**
+A guardrailed autonomous operations agent, published as a **decentralized AI
+service** on the ASI / Fetch.ai stack. It detects a settled-revenue drop,
+attributes it to the exact configuration change that caused it, quantifies the
+loss, and proposes the one-line fix, returning a verifiable audit object with
+every call. It proposes; a human owns the merge.
 
-A payments configuration is pushed at 14:03. It routes one region's card traffic
-to a gateway that declines most authorisations. Order volume still looks normal,
-because customers keep trying to buy. Settled revenue quietly falls, and nobody
-notices until the next morning. Ledgerkeep is the agent an on-call operator would
-let near that problem: it detects the drop, attributes it to the exact change,
-quantifies the loss, and proposes the one-line fix, returning a verifiable audit
-object with every call. It proposes; a human owns the merge.
+Every call answers one typed contract over either transport: a real uAgents
+endpoint on Agentverse when a seed phrase and the SDK are present (testnet only),
+or an in-process transport otherwise, so the service runs keyless. The safety
+layer is not a promise for a later milestone; it is vendored, tested here, and
+recorded by name on every run.
 
-![Ledgerkeep incident console](docs/ui.png)
+**Milestone 1** of the Ledgerkeep grant proposal: the re-themed service, the
+documented contract, the audit object on every call, and the offline loop and
+guardrail suite running green. Testnet only, never mainnet.
+
+**[▶ Live demo](https://doom2quake.github.io/asi-deep-funding/ui/)**  ·  **[Watch the walkthrough](https://youtu.be/LEDGERKEEP_VIDEO)**  ·  **[Paper (PDF)](paper/paper.pdf)**  ·  **[Deck (PDF)](deck/deck.pdf)**  ·  Built for the **[ASI Alliance](https://superintelligence.io/)**
+
+Read [docs/LIMITATIONS.md](docs/LIMITATIONS.md) first for the short version of what
+has run, what is simulated, and what is not built. Nothing on this page contradicts
+it.
+
+## The 30-second demo
 
 ```text
 $ python -m ledgerkeep
@@ -30,17 +42,14 @@ guardrails enforced  ACTION_LIMITER, CONTENT_SAFETY, DOMAIN_ROUTER (3 decisions 
 audit content_hash   7d735e4ee91547f25deb2bd262182fd85439c0a87ed79c0c250ca0560a55fd25
 ```
 
-## Why this is an ASI / Fetch.ai service
+Step 4 is the one worth pausing on. The proposed fix is never applied: it comes
+back with `approved=False` every time, so an autonomous run ends at a proposal a
+human still has to merge. The step before it is the other one to notice: the
+attribution is screened by `CONTENT_SAFETY` before anything downstream trusts it,
+so a poisoned diagnosis quarantines the run with no proposed fix at all.
 
-Deep Funding is explicit about funding decentralized AI *services*: agents that
-others can discover, call, and pay for, while the builder keeps ownership. An
-operations agent a team must trust is exactly that shape. Ledgerkeep is packaged
-as a marketplace service with a stable, typed request and response, and an audit
-object returned on every call so the caller can verify the chain from *a number
-moved* to *this proposed fix*. The funder's technology is load-bearing behind an
-adapter seam: when a seed phrase and the `uagents` SDK are present, the service
-is a real uAgents endpoint on Agentverse (testnet only); otherwise it answers the
-identical contract over an in-process transport, so it runs keyless.
+The same guarantees are enforced in the tested path, and `pytest` proves each of
+them.
 
 ## Architecture
 
@@ -78,13 +87,13 @@ flowchart TD
     end
     SVC -.uses.-> CORE
 
-    classDef c fill:#1b2130,stroke:#242c3a,color:#c7d0dd;
+    classDef c fill:#1b1a30,stroke:#2f2657,color:#cfc6f0;
 ```
 
 ## Run it
 
-Everything runs with the standard library plus `python-dotenv`. No credentials,
-no cloud project, no network.
+Everything runs with the standard library plus `python-dotenv`. No credentials, no
+cloud project, no network.
 
 ```bash
 python -m ledgerkeep            # narrate one guardrailed investigation
@@ -100,28 +109,28 @@ from ledgerkeep.marketplace import MarketplaceService
 service = MarketplaceService()
 response = service.invoke({"metric": "settled_revenue"})
 print(response.status)                     # "acted"
-print(response.proposed_fix.approved)      # False — a human owns the merge
+print(response.proposed_fix.approved)      # False, a human owns the merge
 print(response.audit.content_hash)         # sha256 over the decision chain
 ```
 
 ## The service contract
 
-- **`InvestigationRequest`** — typed, all-defaults, so the simplest call is
-  `InvestigationRequest()`. Fields: `metric`, `z_threshold`, `note`,
-  `request_id`, `contract_version`.
-- **`InvestigationResponse`** — the typed reply. `anomaly`, `attribution`,
+- **`InvestigationRequest`**: typed, all-defaults, so the simplest call is
+  `InvestigationRequest()`. Fields: `metric`, `z_threshold`, `note`, `request_id`,
+  `contract_version`.
+- **`InvestigationResponse`**: the typed reply. `anomaly`, `attribution`,
   `impact`, `proposed_fix` (always `approved=False`), `verification`,
   `delivery_mode` (`offline_fixture` | `live`, so a stub is never mistaken for a
   live figure), and a mandatory **`audit`**.
-- **`AuditObject`** — returned on **every** call. Carries the run id, the ordered
-  guardrail decisions by name, the classified domain, the recurrence record, and
-  a sha256 `content_hash` over the decision chain. A response without an audit
-  object is not a valid response.
+- **`AuditObject`**: returned on **every** call. Carries the run id, the ordered
+  guardrail decisions by name, the classified domain, the recurrence record, and a
+  sha256 `content_hash` over the decision chain. A response without an audit object
+  is not a valid response.
 
 ## The guardrails
 
-Autonomy is only safe when it is bounded. Every decision is recorded on the run
-by name, so a claim of enforcement is a count of what happened.
+Autonomy is only safe when it is bounded. Every decision is recorded on the run by
+name, so a claim of enforcement is a count of what happened.
 
 | Guardrail | What it does | Tested by |
 | --- | --- | --- |
@@ -132,18 +141,60 @@ by name, so a claim of enforcement is a count of what happened.
 ## Built on agent-core
 
 The control plane is the vendored [`agent_core`](ledgerkeep/agent_core) package:
-guardrails, a domain-aware router, durable run state with recurrence detection,
-and an MCP bridge. It is vendored into this repo and exercised by its own tests
-here, so the safety layer is not a promise for a later milestone.
+guardrails, a domain-aware router, durable run state with recurrence detection, and
+an MCP bridge. It is vendored into this repo and exercised by its own tests here,
+so the safety layer is not a promise for a later milestone.
 
-## Milestone 1 scope, and what is not built
+## Tests
 
-This repo is **milestone 1**: the re-themed service, the documented contract, the
-audit object on every call, and the offline loop and guardrail suite running
-green. There is no live marketplace publication, no mainnet, no durable state in
-the tested path, and no users or revenue. See
-[`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) for the full, honest separation of
-what has run from what has not.
+- `PYTHONPATH=. pytest -q`, **82 Python tests**. No env vars or credentials needed;
+  the suite cuts the socket, HTTP and subprocess layers before import and forces
+  the run store in-memory. Service contract (10), guardrailed loop (7), marketplace
+  adapter (10), fixture ledger (7), vendored `agent_core` (48).
+
+Every defence in this repo has a test that fails without it.
+
+## Built for the ASI Alliance and Deep Funding
+
+Ledgerkeep is a candidate entry to [Deep Funding](https://deepfunding.ai/), the
+grant programme of the [Artificial Superintelligence Alliance](https://superintelligence.io/)
+(the [Fetch.ai](https://fetch.ai/), [SingularityNET](https://singularitynet.io/),
+and Ocean Protocol federation). It is an application, not an accepted or funded
+grant: there is no partnership with the Alliance and no endorsement, and nothing
+here should be read as one.
+
+The reason it belongs on the ASI stack rather than a closed SaaS is that Deep
+Funding backs decentralized AI **services**: agents others can discover, call, and
+pay for while the builder keeps ownership. An operations agent a team must trust is
+exactly that shape. The funder's technology is load-bearing behind an adapter seam:
+when a seed phrase and the [`uagents`](https://superintelligence.io/) SDK are
+present, the service is a real uAgents endpoint on
+[Agentverse](https://superintelligence.io/) (testnet only); otherwise it answers
+the identical contract keyless. The milestone roadmap integrates the ecosystem
+where it is needed: MCP composition so another ASI agent can call Ledgerkeep as a
+tool (milestone 2), testnet audit-hash anchoring for verifiable provenance
+(milestone 3), and Agentverse / marketplace publication (milestone 4). Everything
+in this repo is **testnet only**, with no mainnet deployment and no real funds.
+
+The full milestone-mapped write-up is in [docs/PROPOSAL.md](docs/PROPOSAL.md).
+
+## Paper, deck & UI
+
+- **[Paper (PDF)](paper/paper.pdf):** `paper/paper.tex`, a short technical write-up
+  (rebuild: `tectonic paper/paper.tex`).
+- **[Deck (PDF)](deck/deck.pdf):** `deck/deck.md`, a Marp slide deck (rebuild:
+  `marp deck/deck.md --pdf`).
+- **[Live demo](https://doom2quake.github.io/asi-deep-funding/ui/):**
+  `ui/index.html`, the interactive incident console (also opens offline over
+  `file://`). It is a browser simulation and says so on the page; every figure it
+  shows is read off the audit object the service returns, with no invented
+  transaction hashes.
+- **Walkthrough video:** [`docs/ledgerkeep-demo.mp4`](docs/ledgerkeep-demo.mp4), a
+  narrated tour of the 03:00 problem, the guardrails, the service contract, and the
+  grant roadmap (also on [YouTube](https://youtu.be/LEDGERKEEP_VIDEO)).
+- **Demo script:** `DEMO.md`, the recording kit.
+
+[![Ledgerkeep incident console](docs/ui.png)](https://doom2quake.github.io/asi-deep-funding/ui/)
 
 ## Cite
 
@@ -153,9 +204,11 @@ what has run from what has not.
   title   = {Ledgerkeep: A Guardrailed Autonomous Operations Agent as a Decentralized AI Service},
   year    = {2026},
   version = {0.1.0},
-  url     = {https://github.com/doom2quake/ledgerkeep},
+  url     = {https://github.com/doom2quake/asi-deep-funding},
   license = {MIT}
 }
 ```
 
-Licensed MIT. Copyright (c) 2026 doom2quake.
+## License
+
+MIT, held by doom2quake, see [LICENSE](LICENSE).
