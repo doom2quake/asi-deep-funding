@@ -16,7 +16,7 @@ recorded by name on every run.
 documented contract, the audit object on every call, and the offline loop and
 guardrail suite running green. Testnet only, never mainnet.
 
-**[▶ Live demo](https://doom2quake.github.io/asi-deep-funding/ui/)**  ·  **[Watch the walkthrough](https://youtu.be/LEDGERKEEP_VIDEO)**  ·  **[Paper (PDF)](paper/paper.pdf)**  ·  **[Deck (PDF)](deck/deck.pdf)**  ·  Built for the **[ASI Alliance](https://superintelligence.io/)**
+**[▶ Live demo](https://doom2quake.github.io/ledgerkeep/ui/)**  ·  **[Watch the walkthrough](https://youtu.be/LEDGERKEEP_VIDEO)**  ·  **[Paper (PDF)](paper/paper.pdf)**  ·  **[Deck (PDF)](deck/deck.pdf)**  ·  Built for the **[ASI Alliance](https://superintelligence.io/)**
 
 Read [docs/LIMITATIONS.md](docs/LIMITATIONS.md) first for the short version of what
 has run, what is simulated, and what is not built. Nothing on this page contradicts
@@ -184,7 +184,7 @@ The full milestone-mapped write-up is in [docs/PROPOSAL.md](docs/PROPOSAL.md).
   (rebuild: `tectonic paper/paper.tex`).
 - **[Deck (PDF)](deck/deck.pdf):** `deck/deck.md`, a Marp slide deck (rebuild:
   `marp deck/deck.md --pdf`).
-- **[Live demo](https://doom2quake.github.io/asi-deep-funding/ui/):**
+- **[Live demo](https://doom2quake.github.io/ledgerkeep/ui/):**
   `ui/index.html`, the interactive incident console (also opens offline over
   `file://`). It is a browser simulation and says so on the page; every figure it
   shows is read off the audit object the service returns, with no invented
@@ -194,7 +194,7 @@ The full milestone-mapped write-up is in [docs/PROPOSAL.md](docs/PROPOSAL.md).
   grant roadmap (also on [YouTube](https://youtu.be/LEDGERKEEP_VIDEO)).
 - **Demo script:** `DEMO.md`, the recording kit.
 
-[![Ledgerkeep incident console](docs/ui.png)](https://doom2quake.github.io/asi-deep-funding/ui/)
+[![Ledgerkeep incident console](docs/ui.png)](https://doom2quake.github.io/ledgerkeep/ui/)
 
 ## Cite
 
